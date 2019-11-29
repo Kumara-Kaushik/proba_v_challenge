@@ -40,7 +40,7 @@ We will initially train the model with low resolution images and to output image
 
 While The compitition asks us to use a specific type of loss function called cPSNR, I chose to rather use a more detailed loss function called Perceptual Loss function derived from this paper. The reason being, while the cPSNR seems to be a good loss metric for the given data, but PSNR can vary wily between two similar images. Sometimes, we get a good PSNR value between two images which have some obvious diference between them. Therefore, using a more sophisticated different loss function which will enable us to effectively train a model which can more accuratly judge if the image its predicting has the right features. Not only that, We will making making slight modifications to the loss by also adding gram matrix style loss to help us accuratly predict images with the right style. The loss function we will be using in this paper will be further explained below.
 
-![loss_function](proba_1.png)
+![loss_function](/pictures/proba_1.png)
 
 As shown, in the above figure, The loss was originally implemented on a VGG network, the weights at all the loss calculating layers remain the same, therefore, we will be taking all the relavent layers and build only the [arts necessary to create a loss function which best replicates the above loss function. We will also be adding an additional loss function called gram matrix loss. Gram matrix loss is generally employed in style transfer algorithms. We can use this to our advantage to effectively transfer the right image style when generating a super resolution image.
 
