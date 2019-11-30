@@ -1,7 +1,9 @@
 import cv2 as cv2
 from fastai.vision import *
+from fastai.basics import *
 import shutil
 import fire
+import matplotlib.pyplot as plt
 
 import skimage
 from skimage import io
@@ -68,6 +70,35 @@ class SuperResolution():
             hr_save_path = str(fn).replace("LR", "HR")
             if not os.path.exists(hr_save_path):
                 cv2.imwrite(hr_save_path, bi_img)
+
+    def predict_one(self, img_path):
+        fn = Path(img_path)
+        # get low resolution image
+        lr_img = cv2.imread(str(fn), -1)
+
+        # get super resolution image
+        img = open_image(fn)
+        p,img_hr,b = learn.predict(img)
+        sr_img = (img_hr.data.cpu().permute(1,2,0).numpy()[..., 1]*65535).astype(np.uint16)
+
+        # Get ground truth HR image
+        hr_img = cv2.imread(str(fn).replace("LR", "HR"), -1)
+
+        # Get bi-linear upsampled image
+        float_img = skimage.img_as_float(lr_img)
+        rescaled_img = rescale(float_img, scale=3, order=3, mode='edge', anti_aliasing=False, multichannel=False)
+        bi_img = (np.array(rescaled_img)*65535).astype(np.uint16)
+
+        _, axarr = plt.subplots(2, 2, figsize=(18, 18))
+        axarr[0,0].imshow(lr_img)
+        axarr[0,0].set_title('Low Resolution Image', fontsize=20, color="white")
+        axarr[0,1].imshow(hr_img)
+        axarr[0,1].set_title('High Resolution Image', fontsize=20, color="white")
+        axarr[1,0].imshow(bi_img)
+        axarr[1,0].set_title('Bilinear Upsampled Image', fontsize=20, color="white")
+        axarr[1,1].imshow(sr_img)
+        axarr[1,1].set_title('Super Resolution Predicted Image', fontsize=20, color="white")
+        plt.show()
 
 if "__name__"=="__main__":
     fire.fire(SuperResolution)
