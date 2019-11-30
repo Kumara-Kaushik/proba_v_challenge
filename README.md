@@ -8,8 +8,9 @@ We are given multiple images of each of 78 Earth locations and we are asked to d
 ![satellite image](/pictures/proba_2.png)
 
 ## Data preparation:
-We are provided with a varying number of low resolution images (16 bit gray scale images) for each scene. They also come with corresponding masks representing which areas of the image are covered with clouds and other similar obstructions. 
-
+We are provided with a varying number of low resolution images (16 bit gray scale images) for each scene. They also come with corresponding masks representing which areas of the image are covered with clouds and other similar obstructions. For example:
+![mask display](/pictures/display_1.png)
+![mask display1](/pictures/display_3.png)
 
 As shown in the figures below, The way we process the data is as follows:
 1. For each scene, We read all the given low-resolution images, and their corresponding maps and store then in numpy array format. 
@@ -21,6 +22,9 @@ As shown in the figures below, The way we process the data is as follows:
 ![2nd image](/pictures/draw_2.png)
 
 We do this because taking the median or average across all the images will include pixel values of all the obstructed parts of the image as well. By taking the average of only the unobstructed pixels, we get a better, more accurate representation of the original scene.
+
+The below figure shows a post processed training LR image which will be used to train the model to predict the corrosponding HR image.
+![compare display](/pictures/display_2.png)
 
 We save all the modified low-resolution images into a folder called LR_imgs with each image's name corresponding to its scene name. We similarly move all the HR images into a folder called HR_imgs with their names changed to match their corresponding scenes.
 
@@ -46,7 +50,14 @@ As shown, in the above figure, The loss was originally implemented on a VGG netw
 
 
 ## Results:
-The results are quite interesting to be honest. The images below show the super resolution predicted image, the HR image and the corresponding bileaner upsampled image. Clearly The model produces more rich and accurate representation of the the ground truth image compared to the bilinear upsampled image. Yet, the model predicted test set returns a worst score than the base score when using the compititon's suggested loss function. The below table shows the scores of the predicted test set with the scores of bilinear upsampled test set. 
+The results are quite interesting to be honest. The images below show the super resolution predicted image, the HR image and the corresponding bileaner upsampled image. Clearly The model produces more rich and accurate representation of the the ground truth image compared to the bilinear upsampled image. Yet, the model predicted test set returns a worst score than the base score when using the compititon's suggested loss function. 
+
+![output_1](/pictures/plot_1.png)
+![output_2](/pictures/plot_2.png)
+
+The below table shows the scores of the predicted test set with the scores of bilinear upsampled test set. 
+
+![table_1](/pictures/table_1.png)
 
 While we could say the loss function the compitition uses does not accuratly determine the right solution, There are other factors we need to consider improving which could help us increase the score. for instance:
 1. The difference in brightness seems to play a major role in the the calculation of the the cPSNR scores. 
@@ -58,12 +69,31 @@ All this  could be a major factor which will lead to score improvement. Yet, I c
 
 ## Conclusion:
 This was an experimental implementation to find a differnt solution to the problem. As mentioned above, It will definitly need more modifications and experimentations. While I will continue to work on it while time allows me, It was quite interesting to see such good results without the need for complex ground up AI architectures and minimal data preprocessing. 
-![output_1](/pictures/plot_1.png)
-![output_2](/pictures/plot_2.png)
-![table_1](/pictures/table_1.png
 
 The challenge's winning solutions were built with special ground up architectures which take care of the points we missed including in this experimentation, While I experimented with the Unet Architecture here, I would rather implement their solution for an immediate real world project. 
 
+## Repo Instructions:
+
+This Implementation requires you to have the fastai library installed. Installing the dependencies in the requirments.txt file should be enough to run the repo. It is also recommended to install the dependencies in a virtual environment.
+
+### Data Preparation:
+* Once the repo has been cloned, enter the base directory and run the fllowing command to download and prepare the dataset.
+  python generate_data.py --download=True
+  
+### Training the model:
+* In order to train the model, You can run the Jupyter notebook called "train_probav_model.ipynb" from top to bottom in order. Or you can skip this step and use a saved model I have trained using the same method by downloading the export model file from here called "export.pkl", placing it in the root directory and running the inference script.
+
+### Generating submission file and running inference on single image:
+* In order to generate the submission file, Please download the trained model export file from here and place it in the root directory.
+* In order to genereate the super resolution images for all the images in the test folder, run the following command:
+  python predict.py --root=./ save_final_images
+  
+* In order to zip it into a submission file, run the following command:
+  python predict.py --root=<data_root_path> save_final_images
+  
+* In order to do predictions on single images and compare it with its bilinear upsampled counterpart and HR ground truth, You can run the following command and specifying the image path.
+  python predict_one.py --path=<image_root_path>
+  
 ## References
 
 1. https://arxiv.org/abs/1603.08155
