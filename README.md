@@ -57,7 +57,10 @@ All this  could be a major factor which will lead to score improvement. Yet, I c
 
 
 ## Conclusion:
-This was an experimental implementation to find a differnt solution to the problem. As mentioned above, It will definitly need more modifications and experimentations. While I will continue to work on it while time allows me, It was quite interesting to see such good results without the need for complex ground up AI architectures and minimal data preprocessing.  
+This was an experimental implementation to find a differnt solution to the problem. As mentioned above, It will definitly need more modifications and experimentations. While I will continue to work on it while time allows me, It was quite interesting to see such good results without the need for complex ground up AI architectures and minimal data preprocessing. 
+![output_1](/pictures/plot_1.png)
+![output_2](/pictures/plot_2.png)
+![table_1](/pictures/table_1.png
 
 The challenge's winning solutions were built with special ground up architectures which take care of the points we missed including in this experimentation, While I experimented with the Unet Architecture here, I would rather implement their solution for an immediate real world project. 
 
