@@ -1,0 +1,10 @@
+fastai==1.0.59
+fire==0.1.3
+opencv-contrib-python==4.1.0.25
+opencv-python==4.1.0.25
+scikit-image==0.15.0
+scikit-learn==0.21.3
+torch==1.1.0
+torchvision==0.3.0
+tqdm==4.35.0
+
