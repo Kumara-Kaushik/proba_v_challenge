@@ -22,6 +22,9 @@ def prepare_dataset(root="./probav_data", download=False):
         print("dataset downloaded and extracted!")
         os.remove(os.path.join(root,'probav_data.zip'))
 
+        if os.path.exists(os.path.join(root, "readme.txt")):
+            os.remove(os.path.join(root, "readme.txt"))
+
     train_path = os.path.join(root, "train")
     test_path = os.path.join(root, "test")
 
