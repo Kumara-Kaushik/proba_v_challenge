@@ -11,10 +11,12 @@ import tqdm
 import wget
 
 
-def prepare_dataset(root_path="./probav_data", download=False):
+def prepare_dataset(root_path="./", download=False):
 
-    if not os.path.exists(os.path.join(root_path, "probav_data")):
-        os.mkdir(os.path.join(root_path, "probav_data"))
+    if not os.path.exists(root_path + "probav_data"):
+        os.mkdir(root_path + "probav_data")
+
+    root = root_path + "probav_data"
 
     if download:
         print("Downloading Dataset...")
