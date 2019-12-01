@@ -11,12 +11,15 @@ import tqdm
 import wget
 
 
-def prepare_dataset(root="./probav_data", download=False):
+def prepare_dataset(root_path="./probav_data", download=False):
+
+    if not os.path.exists(os.path.join(root_path, "probav_data")):
+        os.mkdir(os.path.join(root_path, "probav_data"))
 
     if download:
         print("Downloading Dataset...")
-        # url = "https://kelvins.esa.int/media/competitions/proba-v-super-resolution/probav_data.zip"
-        # wget.download(url, './probav_data/probav_data.zip')
+        url = "https://kelvins.esa.int/media/competitions/proba-v-super-resolution/probav_data.zip"
+        wget.download(url, './probav_data/probav_data.zip')
         print("Extracting the data...")
         ZipFile(os.path.join(root,'probav_data.zip')).extractall(root+'/')
         print("dataset downloaded and extracted!")
