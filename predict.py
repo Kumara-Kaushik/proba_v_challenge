@@ -38,25 +38,25 @@ class FeatureLoss(nn.Module):
 
 class SuperResolution():
     def __init__(self, root_path="./"):
-        import pdb; pdb.set_trace()
-        self.proba_data = Path(root_path/"probav_data")
+        self.model_path = Path(root_path+"model_data")
+        self.proba_data = Path(root_path+"probav_data")
         self.test_path_hr = self.proba_data.ls()[2]/'HR_imgs'
         self.test_path_lr = self.proba_data.ls()[2]/'LR_imgs'
-        if os.path.exists(str(root_path+'/model_data/export.pkl')):
+        if os.path.exists(str(self.model_path/'export.pkl')):
             print("Building model...")
             self._build_model()
             print("Model build successful!")
         else:
-            raise Exception(f"Given root path = {str(root_path+'/model_data')} does not contain the export.pkl file!")
+            raise Exception(f"Given root path = {str(self.model_path)} does not contain the export.pkl file!")
 
     def _build_model(self):
-        learn = load_learner(self.proba_data/"train/LR_imgs")
+        self.learn = load_learner(self.model_path)
 
     def save_final_images(self):
         print("Predicting and saving super resolution images for all test data images...")
         for fn in self.test_path_lr.ls():
             img = open_image(fn)
-            p,img_hr,b = learn.predict(img)
+            p,img_hr,b = self.learn.predict(img)
             hr_pred_img = (img_hr.data.cpu().permute(1,2,0).numpy()[..., 1]*65535).astype(np.uint16)
             hr_save_path = str(fn).replace("LR", "HR")
             if not os.path.exists(hr_save_path):
@@ -87,7 +87,7 @@ class SuperResolution():
 
         # get super resolution image
         img = open_image(fn)
-        p,img_hr,b = learn.predict(img)
+        p,img_hr,b = self.learn.predict(img)
         sr_img = (img_hr.data.cpu().permute(1,2,0).numpy()[..., 1]*65535).astype(np.uint16)
 
         # Get ground truth HR image
