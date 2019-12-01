@@ -1,29 +1,34 @@
 # Proba v challenge:
 The code in this repo documents my approach at attempting to solve the proba-v vhallenge. 
-Note: This is an experimental approach using U-net Architecture to explore a new way to solve the challenge. The winners of the challenge released their codes here and here, These models are end to end networks specifically trained for the challenge. Instead I will be using a ResNet pre-trained U-net model approach to see if we can obtain similar or better results with a more generalized architecture. 
+Note: This is an experimental approach using U-net Architecture to explore a new way to solve the challenge. The winners of the challenge released their codes [here](https://github.com/diegovalsesia/deepsum) and [here](https://github.com/ElementAI/HighRes-net/blob/master/README.md), These models are end to end networks specifically trained for the challenge. Instead I will be using a ResNet pre-trained U-net model approach to see if we can obtain similar or better results with a more generalized architecture. 
 
 ## Problem statement:
 We are given multiple images of each of 78 Earth locations and we are asked to develop an algorithm to fuse them together into a single one. The result should be a "super-resolved" image that is checked against a high resolution image taken from the same satellite, PROBA-V. The 'V' stands for Vegetation, which is the main focus of the on-board instruments.
 
 ![satellite image](/pictures/proba_2.png)
+-image reference - https://github.com/cedricoeldorf/proba-v-super-resolution-challenge)
 
 ## Data preparation:
 We are provided with a varying number of low resolution images (16 bit gray scale images) for each scene. They also come with corresponding masks representing which areas of the image are covered with clouds and other similar obstructions. For example:
+
 ![mask display](/pictures/display_1.png)
 ![mask display1](/pictures/display_3.png)
 
 As shown in the figures below, The way we process the data is as follows:
 1. For each scene, We read all the given low-resolution images, and their corresponding maps and store then in numpy array format. 
+
 ![1st image](/pictures/draw_1.png)
 
 2. We also create an empty numpy array to represent the final training image.
 3. Looping through each pixel index, We will compare the low resolution images with their corresponding masks, take the pixel values at that index of only the images whose masks shows us they aren't obstructed.
 4. We then take the median of these pixels and replace them in the corresponding index of the final training image. 
+
 ![2nd image](/pictures/draw_2.png)
 
 We do this because taking the median or average across all the images will include pixel values of all the obstructed parts of the image as well. By taking the average of only the unobstructed pixels, we get a better, more accurate representation of the original scene.
 
 The below figure shows a post processed training LR image which will be used to train the model to predict the corresponding HR image.
+
 ![compare display](/pictures/display_2.png)
 
 We save all the modified low-resolution images into a folder called LR_imgs with each image's name corresponding to its scene name. We similarly move all the HR images into a folder called HR_imgs with their names changed to match their corresponding scenes.
@@ -32,6 +37,7 @@ We save all the modified low-resolution images into a folder called LR_imgs with
 The model architecture I chose to use here is a Unet based architecture.
 
 As shown below, A U-net based architecture basically consists of two parts. A down sampler network and an up-sampler network. But the most important feature which makes this a really good choice for super resolution is its skip connection between layers. This allows the model to retain information from all stages of the pipeline which makes it a really good choice for super resolution tasks. we will be using a ResNet-34 architecture pre-trained on the Image-net database as the down sampler and up-sampler of the U-net design. The pre-trained weights should help us learn the image features a lot better than than an non pre-trained model.
+
 ![img_3](/pictures/draw_3.png)
 
 But one of the drawbacks of the pre-trained model is that the Image-net database on which it was trained on, only has images of more general things like cats, dogs, humans, etc. How can this help in satellite imagery?
@@ -42,11 +48,11 @@ We will initially train the model with low resolution images and to output image
 
 ## Loss Function:
 
-While the competition asks us to use a specific type of loss function called cPSNR, I chose to rather use a more detailed loss function called Perceptual Loss function derived from this paper. The reason being, while the cPSNR seems to be a good loss metric for the given data, but PSNR can vary wily between two similar images. Sometimes, we get a good PSNR value between two images which have some obvious difference between them. Therefore, using a more sophisticated different loss function which will enable us to effectively train a model which can more accurately judge if the image its predicting has the right features. Not only that, We will making making slight modifications to the loss by also adding gram matrix style loss to help us accurately predict images with the right style. The loss function we will be using in this paper will be further explained below.
+While the competition asks us to use a specific type of loss function called cPSNR, I chose to rather use a more detailed loss function called Perceptual Loss function derived from [this](https://arxiv.org/abs/1603.08155) paper. The reason being, while the cPSNR seems to be a good loss metric for the given data, but PSNR can vary wildly between two similar images. Sometimes, we get a good PSNR value between two images which have some obvious difference between them. Therefore, using a more sophisticated different loss function which will enable us to effectively train a model which can more accurately judge if the image its predicting has the right features. Not only that, We will making making slight modifications to the loss by also adding gram matrix style loss to help us accurately predict images with the right style. The loss function we will be using in this paper will be further explained below.
 
 ![loss_function](/pictures/proba_1.png)
 
-As shown, in the above figure, The loss was originally implemented on a VGG network, the weights at all the loss calculating layers remain the same, therefore, we will be taking all the relevant layers and build only the [arts necessary to create a loss function which best replicates the above loss function. We will also be adding an additional loss function called gram matrix loss. Gram matrix loss is generally employed in style transfer algorithms. We can use this to our advantage to effectively transfer the right image style when generating a super resolution image.
+As shown, in the above figure, The loss was originally implemented on a VGG network, the weights at all the loss calculating layers remain the same, therefore, we will be taking all the relevant layers and build only the parts necessary to create a loss function which best replicates the above loss function. We will also be adding an additional loss function called gram matrix loss. Gram matrix loss is generally employed in style transfer algorithms. We can use this to our advantage to effectively transfer the right image style when generating a super resolution image.
 
 
 ## Results:
@@ -59,12 +65,12 @@ The below table shows the scores of the predicted test set with the scores of bi
 
 ![table_1](/pictures/table_1.png)
 
-While we could say the loss function the competition uses does not accurately determine the right solution, There are other factors we need to consider improving which could help us increase the score. for instance:
+While we could say the loss function the competition uses, does not accurately determine the right solution, There are other factors we need to consider improving which could help us increase the score. for instance:
 1. The difference in brightness seems to play a major role in the the calculation of the the cPSNR scores. 
 2. We do not make use of the masks provided for the HR images. 
 3. We do not account for the minor shifts which are present between the LR and HR images.
 
-All this could be a major factor which will lead to score improvement. Yet, I can safely say that the model produces clearer high definition images than a bi-linear up-sampled images. 
+All this could be a major factor which will lead to score improvement. Yet, I can safely say that the model produces clearer high definition images than their bi-linear up-sampled counterparts. 
 
 
 ## Conclusion:
@@ -87,7 +93,7 @@ This Implementation requires you to have the fastai library installed. Installin
 ### Generating submission file and running inference on single image:
 * In order to generate the submission file, Please download the trained model export file from [here](https://drive.google.com/file/d/1KFIL-GI4FYwrZNBOaeFLO2Qdv1zr73yv/view?usp=sharing) and place it in the "model_data" folder.
 
-* Open the notebook called "probav_model_inference" and run the notebook from top to bottom. You also have the option of running inference on single images, but they have to be from either the train or test LR_imgs folder.
+* Open the notebook called "probav_model_inference.ipynb" and run the notebook from top to bottom. You also have the option of running inference on single images, but they have to be from either the train or test LR_imgs folder.
 
 ## References
 
