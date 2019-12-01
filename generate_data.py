@@ -8,16 +8,19 @@ from urllib.request import urlretrieve
 from zipfile import ZipFile
 import fire
 import tqdm
+import wget
 
 
 def prepare_dataset(root="./probav_data", download=False):
 
     if download:
         print("Downloading Dataset...")
-        urlretrieve('https://kelvins.esa.int/media/competitions/proba-v-super-resolution/probav_data.zip',
-                filename='probav_data.zip')
-        ZipFile('probav_data.zip').extractall('./probav_data/')
+        # url = "https://kelvins.esa.int/media/competitions/proba-v-super-resolution/probav_data.zip"
+        # wget.download(url, './probav_data/probav_data.zip')
+        print("Extracting the data...")
+        ZipFile(os.path.join(root,'probav_data.zip')).extractall(root+'/')
         print("dataset downloaded and extracted!")
+        os.remove(os.path.join(root,'probav_data.zip'))
 
     train_path = os.path.join(root, "train")
     test_path = os.path.join(root, "test")
