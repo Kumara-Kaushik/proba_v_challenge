@@ -77,21 +77,22 @@ The challenge's winning solutions were built with special ground up architecture
 This Implementation requires you to have the fastai library installed. Installing the dependencies in the requirments.txt file should be enough to run the repo. It is also recommended to install the dependencies in a virtual environment.
 
 ### Data Preparation:
-* Once the repo has been cloned, enter the base directory and run the fllowing command to download and prepare the dataset.
+* Once the repo has been cloned, enter the base directory and run the f0llowing command to download and prepare the dataset. (set download to False if you already have the data unzipped in the probav_data folder.)
+  
   python generate_data.py --download=True
   
 ### Training the model:
-* In order to train the model, You can run the Jupyter notebook called "train_probav_model.ipynb" from top to bottom in order. Or you can skip this step and use a saved model I have trained using the same method by downloading the export model file from here called "export.pkl", placing it in the root directory and running the inference script.
+* In order to train the model, You can run the Jupyter notebook called "train_probav_model.ipynb" from top to bottom in order. Or you can skip this step and use a saved model I have trained using the same method by downloading the export model file from [here](https://drive.google.com/file/d/1KFIL-GI4FYwrZNBOaeFLO2Qdv1zr73yv/view?usp=sharing) called "export.pkl", placing it in the "model_data" folder and running the inference script.
 
 ### Generating submission file and running inference on single image:
-* In order to generate the submission file, Please download the trained model export file from here and place it in the root directory.
-* In order to genereate the super resolution images for all the images in the test folder, run the following command:
-  python predict.py --root=./ save_final_images
+* In order to generate the submission file, Please download the trained model export file from [here](https://drive.google.com/file/d/1KFIL-GI4FYwrZNBOaeFLO2Qdv1zr73yv/view?usp=sharing) and place it in the "model_data" folder.
+
+* In order to genereate the super resolution images for all the images in the test folder and zip it into a submission file, run the following command:
   
-* In order to zip it into a submission file, run the following command:
-  python predict.py --root=<data_root_path> save_final_images
+  python predict.py save_final_images
   
 * In order to do predictions on single images and compare it with its bilinear upsampled counterpart and HR ground truth, You can run the following command and specifying the image path.
+  
   python predict_one.py --path=<image_root_path>
   
 ## References
